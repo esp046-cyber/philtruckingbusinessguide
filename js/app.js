@@ -40,7 +40,7 @@ $('#out').innerHTML=`<h3>Recommended billing</h3><p class="num" style="font-size
 $('#sv').onclick=()=>{const h=store.get('quotes',[]);h.unshift({d:new Date().toLocaleDateString('en-PH'),rate,km});store.set('quotes',h.slice(0,20));toast('Quote saved');render()}}
 function bind(){const k=location.hash.slice(1);(window.PH&&PH.hooks||[]).forEach(h=>h(k));
 if(k=='business'){$('#bf').oninput=bcalc;bcalc()}
-if(k=='roadmap'){document.querySelectorAll('[data-r]').forEach(e=>e.onchange=()=>{const d=store.get('road',{});d[e.dataset.r]=e.checked;store.set('road',d);render()});$('#rr').onclick=()=>{if(confirm('Reset all roadmap progress?')){store.set('road',{});render()}}}
+if(k=='roadmap'){document.querySelectorAll('[data-r]').forEach(e=>e.onchange=()=>{const d=store.get('road',{});d[e.dataset.r]=e.checked;store.set('road',d);render()});$('#rr').onclick=()=>{if(confirm('Reset all roadmap progress? This cannot be undone.')){store.set('road',{});render()}}}
 if(k=='calculator'){$('#cf2').oninput=calc;calc()}
 if(k=='dashboard')$('#tour').onclick=()=>{location.hash='#compliance';toast('Start with business entity, then local permits.')};
 if(k=='compliance'){document.querySelectorAll('[data-i]').forEach(e=>e.onchange=()=>{const d=store.get('chk',{});d[e.dataset.i]={...d[e.dataset.i],done:e.checked};store.set('chk',d);render()});
@@ -56,7 +56,7 @@ addEventListener('hashchange',()=>{render();scrollTo(0,0)});render();
 const th=['light','dark','hc'];function theme(t){document.documentElement.dataset.theme=t;store.set('th',t);$('meta[name=theme-color]').content='#0F172A'}
 theme(store.get('th',matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 $('#themeBtn').onclick=()=>{const t=th[(th.indexOf(store.get('th','light'))+1)%3];theme(t);toast('Theme: '+t)};
-function net(){const e=$('#net'),o=navigator.onLine;e.textContent=o?'● Online':'○ Offline';e.className='badge '+(o?'ok':'bad')}addEventListener('online',net);addEventListener('offline',net);net();
+function net(){const e=$('#net'),o=navigator.onLine;e.innerHTML='<span aria-hidden="true">'+(o?'●':'○')+'</span><span class="nl">'+(o?'Online':'Offline')+'</span>';e.setAttribute('aria-label',o?'Online':'Offline');e.className='badge '+(o?'ok':'bad')}addEventListener('online',net);addEventListener('offline',net);net();
 function modal(h){const m=$('#modal');$('.mc',m).innerHTML=h+'<p><button id="mx">Close</button></p>';m.hidden=false;$('#mx').focus();$('#mx').onclick=()=>m.hidden=true}
 addEventListener('keydown',e=>{if(e.key=='Escape')$('#modal').hidden=true;if((e.ctrlKey||e.metaKey)&&e.key=='k'){e.preventDefault();search()}});
 function search(){modal('<h3>Search</h3><input id="sq" placeholder="Topic, permit, calculator…" aria-label="Search"><div id="sr"></div>');const idx=[...Object.keys(V).map(k=>[k,'#'+k]),...C.map(c=>[c[1],'#compliance'])];$('#sq').focus();$('#sq').oninput=e=>{const q=e.target.value.toLowerCase();$('#sr').innerHTML=q?idx.filter(i=>i[0].toLowerCase().includes(q)).slice(0,8).map(i=>`<p><a href="${i[1]}" onclick="document.getElementById('modal').hidden=true">${esc(i[0])}</a></p>`).join(''):''};$('#sq').focus()}
